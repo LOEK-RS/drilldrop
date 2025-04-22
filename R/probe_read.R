@@ -47,7 +47,7 @@ probe_read_raw <- function(path){
                      "A3.25.","T3.25.","A4.35.","T4.35.","A5.45.","T5.45.",
                      "A6.55.","T6.55.","A7.65.","T7.65.","A8.75.","T8.75.",
                      "A9.85.","T9.85.","A10.95.","T10.95.", "A11.105.","T11.105.",
-                     "A12.115.","T12.115.")
+                     "A12.115.","T12.115.")[1:ncol(data)]
   return(data)
 
 }
@@ -60,25 +60,7 @@ probe_read <- function(path, startdatetime, enddatetime, excess, organic, raw = 
 
 
   if(raw == TRUE){
-
-    raw_data <- readLines(path)
-    # find out start of data entries in the file
-    data_start = which(raw_data == "ESReadings") + 1
-
-    # turn data vector into data.frame
-    data = read.table(text = raw_data[data_start:length(raw_data)],
-                      header = TRUE, as.is = TRUE, sep  = ",")
-
-
-    data = dplyr::select(data, !contains("Raw"))
-    colnames(data) = c("Date.Time","V1","V2","A1.5.","T1.5.","A2.15.","T2.15.",
-                       "A3.25.","T3.25.","A4.35.","T4.35.","A5.45.","T5.45.",
-                       "A6.55.","T6.55.","A7.65.","T7.65.","A8.75.","T8.75.",
-                       "A9.85.","T9.85.","A10.95.","T10.95.", "A11.105.","T11.105.",
-                       "A12.115.","T12.115.")
-
-
-
+    data <- probe_read_raw(path)
   }else{
     data <- read.csv(path)
   }
@@ -126,7 +108,7 @@ probe_read <- function(path, startdatetime, enddatetime, excess, organic, raw = 
   organic_lut[which(organic_lut$organic == 0)[1],"organic"] <- organic - sum(organic_lut$organic)
 
 
-  data = left_join(data, organic_lut)
+  data = left_join(data, organic_lut, by = join_by(depth))
 
   data$what <- ifelse(grepl("A", data$what), "moisture", "temperature")
 

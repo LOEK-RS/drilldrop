@@ -23,4 +23,30 @@ organic = 7
 
 
 
+### reading multiple probe files
+
+
+probe_files = list.files("~/luenten/data_raw/drillanddrop/2025-04-15_probe_data", full.names = T, pattern = ".csv")
+
+all_probes = lapply(probe_files, function(x){
+  probe_read(x,
+             startdatetime = "2024-11-20 00:00:00",
+             enddatetime = "2025-03-20 00:00:00",
+             excess = 10,
+             organic = 10)
+}
+)
+
+
+
+
+probe_read(probe_files[4],
+           startdatetime = "2024-11-20 00:00:00",
+           enddatetime = "2025-03-20 00:00:00",
+           excess = 10,
+           organic = 10,
+           raw = TRUE)
+
+
+
 
